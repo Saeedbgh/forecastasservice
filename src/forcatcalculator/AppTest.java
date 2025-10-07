@@ -3,22 +3,24 @@ package forcatcalculator;
 import java.math.BigDecimal;
 import java.util.List;
 
+import static forcatcalculator.ForecastService.calculateForecastInDuration;
+
 public class AppTest {
     public static void main(String[] args) {
-        List<ForecastOut> result = ForecastService.calculateForecastInDuration(
-                new BigDecimal("1000"),
-                new BigDecimal("30"),
+        List<ForecastOut> result = calculateForecastInDuration(
+                BigDecimal.valueOf(1_000_000),
+                BigDecimal.valueOf(14),
                 12
         );
 
-        result.forEach(System.out::println);
-
-        BigDecimal totalDeposit = result.get(result.size() - 1).getCumulativeDeposit();
-        BigDecimal totalProfit = result.stream()
-                .map(ForecastOut::getMonthlyProfit)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-        System.out.println("\nTotal Deposit: " + totalDeposit);
-        System.out.println("Total Profit: " + totalProfit.setScale(2, BigDecimal.ROUND_HALF_UP));
+        System.out.printf("%-4s %-15s %-18s %-15s%n",
+                "Month", "  MonthlyDeposit", "  CumulativeAfterDeposit", " MonthlyProfit");
+        for (ForecastOut out : result) {
+            System.out.printf(" %-4d   %-15s  %-18s      %-15s%n",
+                    out.getMonthNumber(),
+                    out.getMonthlyDeposit(),
+                    out.getCumulativeDeposit(),
+                    out.getMonthlyProfit());
+        }
     }
 }
