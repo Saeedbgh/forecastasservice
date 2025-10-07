@@ -1,7 +1,5 @@
 package forcatcalculator;
 
-import forcatcalculator.ForecastOut;
-
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
