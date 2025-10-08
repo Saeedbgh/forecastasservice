@@ -1,10 +1,10 @@
-package basedepositcalculator;
+package insurancepremiumcalculator;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-public class NetSalaryService {
+public class InsurancePremiumService {
 
     private record Range(BigDecimal min, BigDecimal max, BigDecimal rate) {
         public boolean match(BigDecimal value) {
@@ -26,8 +26,8 @@ public class NetSalaryService {
             new Range(new BigDecimal("1000000000"), null, new BigDecimal("0.15"))
     );
 
-    public static List<NetSalaryOut> calculateNetSalaries(List<? extends Number> grossSalaries) {
-        List<NetSalaryOut> results = new ArrayList<>();
+    public static List<InsurancePremiumOut> calculateNetSalaries(List<? extends Number> grossSalaries) {
+        List<InsurancePremiumOut> results = new ArrayList<>();
 
         for (Number salary : grossSalaries) {
             BigDecimal gross = new BigDecimal(salary.toString());
@@ -38,11 +38,10 @@ public class NetSalaryService {
                     .orElseThrow(() -> new IllegalArgumentException("No range matched: " + gross));
 
             BigDecimal insuranceRate = matchedRange.rate();
-            BigDecimal netSalary = gross.subtract(gross.multiply(insuranceRate));
+            BigDecimal insurancePremium = gross.multiply(insuranceRate);
 
-            results.add(new NetSalaryOut(
-                    netSalary
-            ));
+            results.add(new InsurancePremiumOut(insurancePremium));
+
         }
 
         return results;
