@@ -3,49 +3,46 @@ package basedepositcalculator;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Supplier;
 
 public class NetSalaryService {
 
-    public static class Range {
-        private final BigDecimal min; // exclusive
-        private final BigDecimal max; // inclusive
-        private final BigDecimal rate;
-
-        public Range(BigDecimal min, BigDecimal max, BigDecimal rate) {
-            this.min = min;
-            this.max = max;
-            this.rate = rate;
-        }
-
+    private record Range(BigDecimal min, BigDecimal max, BigDecimal rate) {
         public boolean match(BigDecimal value) {
             boolean greaterThanMin = (min == null) || value.compareTo(min) > 0;
             boolean lessEqMax = (max == null) || value.compareTo(max) <= 0;
             return greaterThanMin && lessEqMax;
         }
-
-        public BigDecimal getRate() {
-            return rate;
-        }
     }
 
-    public static List<BigDecimal> calculateInsurance(
-            List<? extends Number> grossSalaries,
-            Supplier<List<Range>> rangeProvider) {
+    // Amount: RIAL
+    private static final List<Range> ranges = List.of(
+            new Range(null, new BigDecimal("400000000"), new BigDecimal("0.02")),
+            new Range(new BigDecimal("400000000"), new BigDecimal("500000000"), new BigDecimal("0.04")),
+            new Range(new BigDecimal("500000000"), new BigDecimal("600000000"), new BigDecimal("0.06")),
+            new Range(new BigDecimal("600000000"), new BigDecimal("700000000"), new BigDecimal("0.08")),
+            new Range(new BigDecimal("700000000"), new BigDecimal("800000000"), new BigDecimal("0.10")),
+            new Range(new BigDecimal("800000000"), new BigDecimal("900000000"), new BigDecimal("0.12")),
+            new Range(new BigDecimal("900000000"), new BigDecimal("1000000000"), new BigDecimal("0.14")),
+            new Range(new BigDecimal("1000000000"), null, new BigDecimal("0.15"))
+    );
 
-        List<Range> ranges = rangeProvider.get();
-        List<BigDecimal> results = new ArrayList<>();
+    public static List<NetSalaryOut> calculateNetSalaries(List<? extends Number> grossSalaries) {
+        List<NetSalaryOut> results = new ArrayList<>();
 
         for (Number salary : grossSalaries) {
-            BigDecimal s = new BigDecimal(salary.toString());
+            BigDecimal gross = new BigDecimal(salary.toString());
 
-            BigDecimal rate = ranges.stream()
-                    .filter(r -> r.match(s))
+            Range matchedRange = ranges.stream()
+                    .filter(r -> r.match(gross))
                     .findFirst()
-                    .orElseThrow(() -> new IllegalArgumentException("No range matched: " + s))
-                    .getRate();
+                    .orElseThrow(() -> new IllegalArgumentException("No range matched: " + gross));
 
-            results.add(s.multiply(rate));
+            BigDecimal insuranceRate = matchedRange.rate();
+            BigDecimal netSalary = gross.subtract(gross.multiply(insuranceRate));
+
+            results.add(new NetSalaryOut(
+                    netSalary
+            ));
         }
 
         return results;
