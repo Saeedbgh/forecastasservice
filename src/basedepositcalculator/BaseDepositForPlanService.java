@@ -1,21 +1,20 @@
 package basedepositcalculator;
 
+import util.SalaryEntry;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
 public class BaseDepositForPlanService {
 
-    public static List<BaseDepositForPlanOut> calculateBaseDeposit(List<? extends Number> grossSalaries) {
+    public static List<BaseDepositForPlanOut> calculateBaseDeposit(List<SalaryEntry> salaryEntries) {
         BigDecimal rate = ConstantRates.BASE_DEPOSIT.getValue();
-
         List<BaseDepositForPlanOut> results = new ArrayList<>();
 
-        for (Number gross : grossSalaries) {
-            BigDecimal grossSalary = new BigDecimal(gross.toString());
-            BigDecimal baseDeposit = grossSalary.multiply(rate);
-
-            results.add(new BaseDepositForPlanOut(baseDeposit));
+        for (SalaryEntry entry : salaryEntries) {
+            BigDecimal baseDeposit = entry.grossSalary().multiply(rate);
+            results.add(new BaseDepositForPlanOut(entry.salaryId(), baseDeposit));
         }
 
         return results;

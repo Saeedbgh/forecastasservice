@@ -1,5 +1,8 @@
 package insurancepremiumcalculator;
 
+
+import util.SalaryEntry;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -8,13 +11,12 @@ public class InsurancePremiumService {
 
     private record Range(BigDecimal min, BigDecimal max, BigDecimal rate) {
         public boolean match(BigDecimal value) {
-            boolean greaterThanMin = (min == null) || value.compareTo(min) > 0;
-            boolean lessEqMax = (max == null) || value.compareTo(max) <= 0;
-            return greaterThanMin && lessEqMax;
+            boolean gtMin = (min == null) || value.compareTo(min) > 0;
+            boolean leMax = (max == null) || value.compareTo(max) <= 0;
+            return gtMin && leMax;
         }
     }
 
-    // Amount: RIAL
     private static final List<Range> ranges = List.of(
             new Range(null, new BigDecimal("400000000"), new BigDecimal("0.02")),
             new Range(new BigDecimal("400000000"), new BigDecimal("500000000"), new BigDecimal("0.04")),
@@ -26,22 +28,24 @@ public class InsurancePremiumService {
             new Range(new BigDecimal("1000000000"), null, new BigDecimal("0.15"))
     );
 
-    public static List<InsurancePremiumOut> calculateNetSalaries(List<? extends Number> grossSalaries) {
+    public static List<InsurancePremiumOut> calculatePremium(List<SalaryEntry> salaryEntries) {
         List<InsurancePremiumOut> results = new ArrayList<>();
 
-        for (Number salary : grossSalaries) {
-            BigDecimal gross = new BigDecimal(salary.toString());
+        for (SalaryEntry entry : salaryEntries) {
+            BigDecimal gross = entry.grossSalary();
 
             Range matchedRange = ranges.stream()
                     .filter(r -> r.match(gross))
                     .findFirst()
                     .orElseThrow(() -> new IllegalArgumentException("No range matched: " + gross));
 
-            BigDecimal insuranceRate = matchedRange.rate();
-            BigDecimal insurancePremium = gross.multiply(insuranceRate);
+            BigDecimal insurancePremium = gross.multiply(matchedRange.rate());
 
-            results.add(new InsurancePremiumOut(insurancePremium));
-
+            results.add(new InsurancePremiumOut(
+                    entry.salaryId(),
+                    insurancePremium,
+                    matchedRange.rate()
+            ));
         }
 
         return results;
