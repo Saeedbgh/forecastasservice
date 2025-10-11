@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 public class Main {
     public static void main(String[] args) {
         // Example input salary (Rial)
-        BigDecimal grossSalary = new BigDecimal(600000001L); // 62M Rial = 6.2M Toman
+        BigDecimal grossSalary = new BigDecimal(62000000); // 62M Rial = 6.2M Toman
 
         NonWithdrawableFund fund = new NonWithdrawableFund();
         InsuranceRateResolver resolver = new InsuranceRateResolver();
@@ -43,5 +43,17 @@ public class Main {
         // Step 3: Rounded final fund (same method output)
         BigDecimal roundedFund = fund.calculateNonWithdrawableFund(grossSalary);
         System.out.println("Rounded Non‑Withdrawable Fund = " + roundedFund);
+
+        System.out.println("------------------------------------------------------------");
+
+        System.out.println("\n\nFinal Result (A + C - E) -- > another way: ");
+        // Example gross salary input in Rials
+        BigDecimal grossSalary1 = new BigDecimal("62000000"); // 62M Rial = 6.2M Toman
+
+        NonWithdrawableFund fund1 = new NonWithdrawableFund();
+
+        BigDecimal result = fund1.calculateNonWithdrawableFund(grossSalary);
+
+        System.out.println("Final Non‑Withdrawable Fund = " + result);
     }
 }
