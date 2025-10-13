@@ -8,7 +8,7 @@ import static forcatcalculator.ForecastService.calculateForecastInDuration;
 public class AppTest {
     public static void main(String[] args) {
         List<ForecastOut> result = calculateForecastInDuration(
-                BigDecimal.valueOf(1_000_000),
+                BigDecimal.valueOf(30271912),
                 BigDecimal.valueOf(14),
                 12
         );

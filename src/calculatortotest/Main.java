@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 public class Main {
     public static void main(String[] args) {
         // Example input salary (Rial)
-        BigDecimal grossSalary = new BigDecimal(62000000); // 62M Rial = 6.2M Toman
+        BigDecimal grossSalary = new BigDecimal(50000000L); // 62M Rial = 6.2M Toman
 
         NonWithdrawableFund fund = new NonWithdrawableFund();
         InsuranceRateResolver resolver = new InsuranceRateResolver();
